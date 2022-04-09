@@ -1,6 +1,10 @@
-# info3180-lab7-vuejs-starter
+# info3180-project2
 
-This template should help get you started developing with Vue 3 in Vite.
+United Auto Sales Web Application. This is a fictional Auto Sales site
+that will allow users to add cars that they want to sell, search for
+available cars and be able to view some more information on those cars.
+Users can also add a car to their favourites so they can quickly get back to
+it.
 
 ## Recommended IDE Setup
 
@@ -35,6 +39,6 @@ Remember to always create a virtual environment and install the packages in your
 ```bash
 $ python -m venv venv (you may need to use python3 instead)
 $ source venv/bin/activate (or .\venv\Scripts\activate on Windows)
-$ pip install -r requirements.txt 
+$ pip install -r requirements.txt
 $ python run.py
 ```
