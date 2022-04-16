@@ -73,6 +73,11 @@ def generate_token(payload):
 # Routing for your application.
 ###
 
+@app.route('/')
+def index():
+    return jsonify(message="This is the beginning of our API")
+
+
 @app.route('/api/register', methods=['POST'])
 def register():
     """Accepts user information and saves it to the database"""
