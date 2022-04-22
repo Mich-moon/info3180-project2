@@ -1,0 +1,92 @@
+
+:root {
+    --theme-green: #0fc5c5;
+}
+body {
+    padding-top: 5rem;
+}
+.flashes {
+    list-style: none;
+    padding: 12px;
+    border-radius: 5px;
+    width: 20%;
+}
+form {
+    display: flex;
+    flex-direction: column;
+}
+form label {
+    font-weight: bold;
+}
+.form-control {
+    display: flex;
+    flex-direction: column;
+    margin: 5px 0px 5px 0px;
+    border: none;
+}
+.form-control button {
+    width: 30%;
+}
+.form-control label {
+    margin-bottom: 5px;
+}
+.form-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    border: none;
+}
+.form-head {
+    margin: 10px auto;
+    width: 50%;
+    padding: 30px;
+}
+nav,
+.card-footer {
+    background-color: var(--theme-green);
+}
+.card-link {
+    text-decoration: none;
+    color: white;
+    text-justify: auto;
+}
+.card p {
+    color: darkgrey;
+}
+#email-owner-btn {
+    background-color: var(--theme-green);
+    color: white;
+    width: 30%;
+}
+#email-owner-btn:hover {
+    background-color: #0b9797;
+}
+select {
+    height: 100%;
+}
+.pill {
+    width: fit-content;
+    height: fit-content;
+    margin: 1em 0em 1em 1em;
+    color: white;
+    font-size: small;
+    padding: 0em 1em 0em 1em;
+}
+.prop-card p {
+    color: black;
+}
+.component {
+    border-radius: 20px;
+    box-shadow: 2px 5px 8px rgb(170, 170, 170);
+    margin: 0 auto;
+    width: 50%;
+    padding: 30px;
+}
+.container {
+    display:flex;
+    width: 100%;
+    justify-items: center;
+    align-content: center;
+}
+  
+  
