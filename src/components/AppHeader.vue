@@ -21,13 +21,13 @@
               <span class="mx-4"/><span class="mx-4"/>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Add Car</RouterLink>
+              <RouterLink class="nav-link" to="/cars/new">Add Car</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Explore</RouterLink>
+              <RouterLink class="nav-link" to="/explore">Explore</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">My Profile</RouterLink>
+              <RouterLink class="nav-link" to="/users/ + id">My Profile</RouterLink>
             </li>
           </ul>
           <ul class="navbar-nav me-auto" v-else>
@@ -43,10 +43,10 @@
           </ul>
           <ul class="navbar-nav mx-4" v-else>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Register</RouterLink>
+              <RouterLink class="nav-link" to="/register">Register</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/about">Login</RouterLink>
+              <RouterLink class="nav-link" to="/login">Login</RouterLink>
             </li>
           </ul>
         </div>
@@ -61,7 +61,8 @@ import { RouterLink } from "vue-router";
   export default {
     data() {
       return {
-        logged_in: false
+        logged_in: false, 
+        profile_route: ""
       }
     },
     created() {
@@ -73,6 +74,22 @@ import { RouterLink } from "vue-router";
 
         if (localStorage.getItem("token")) {
           self.logged_in = true;
+
+          // retrieve user id from token stored in localstorage
+          let jwt_token = localStorage.getItem("token");
+
+          var base64Url = jwt_token.split('.')[1];
+          var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+
+          let jwt_payload = JSON.parse(jsonPayload);
+          let id = jwt_payload['sub'];
+          console.log(id);
+
+          self.profile_route = "/users/" +  id;
+
         } else {
           self.logged_in = false;
         }
@@ -80,6 +97,9 @@ import { RouterLink } from "vue-router";
       logout() {
         let self = this;
         self.logged_in = false;
+        localStorage.removeItem("token");
+        // redirect to home page
+        self.$router.push({ path: '/'});
       }
     },
   };

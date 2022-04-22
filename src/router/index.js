@@ -20,9 +20,19 @@ const router = createRouter({
       component: () => import('../views/RegisterView.vue')
     },
     {
-      path: '/car',
-      name: 'car',
+      path: '/logout',
+      name: 'logout',
+      component: HomeView
+    },
+    {
+      path: '/cars/new',
+      name: 'addcar',
       component: () => import('../views/AddCarView.vue')
+    },
+    {
+      path: '/cars/:car_id',
+      name: 'car',
+      component: () => import('../views/CarView.vue')
     },
     {
       path: '/explore',
@@ -30,9 +40,10 @@ const router = createRouter({
       component: () => import('../views/ExploreView.vue')
     },
     {
-      path: '/profile',
+      path: '/users/:user_id',
       name: 'profile',
-      component: () => import('../views/ProfileView.vue')
+      component: () => import('../views/ProfileView.vue'),
+      props: true
     }
   ]
 })

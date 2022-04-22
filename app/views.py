@@ -13,7 +13,8 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
 from app.models import User, Car, Favourite
-from .forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm, CarForm
+from flask_wtf.csrf import generate_csrf
 
 
 # Using JWT
@@ -66,7 +67,7 @@ def generate_token(payload):
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
 
-    return jsonify(error=None, data={'token': token}, message="Token Generated")
+    return token
 
 
 ###
@@ -78,39 +79,82 @@ def index():
     return jsonify(message="This is the beginning of our API")
 
 
+@app.route('/api/csrf-token', methods=['GET'])
+def get_csrf():
+    return jsonify({'csrf_token': generate_csrf()})
+
+
+def username_exists(user_name):
+    user = db.session.query(User).filter_by(username=user_name).first()
+
+    if user is not None:
+        return True
+    return False
+
+
+def email_exists(email):
+    user = db.session.query(User).filter_by(email=email).first()
+
+    if user is not None:
+        return True
+    return False
+
+
 @app.route('/api/register', methods=['POST'])
 def register():
     """Accepts user information and saves it to the database"""
 
-    form = RegisterForm
-
     if request.method == 'POST':
+
+        form = RegisterForm(obj=request.form)
+
+        err = []
 
         if form.validate_on_submit():
 
-            photo = form.photo.data
-            photo_filename = secure_filename(photo.filename)
-            photo.save(os.path.join(
-                os.environ.get('UPLOAD_FOLDER'), photo_filename
-            ))
+            if email_exists(request.form['email']):
+                err.append("Email is already being used")
 
-            user = User(
-                username=form.username.data,
-                password=form.password.data,
-                name=form.name.data,
-                email=form.email.data,
-                location=form.location.data,
-                biography=form.biography.data,
+            if username_exists(request.form['username']):
+                err.append("Username is already being used")
 
-                photo=photo_filename
-            )
-            db.session.add(user)
-            db.session.commit()
+            if len(err) == 0:
+                photo = form.photo.data
+                photo_filename = secure_filename(photo.filename)
+                photo.save(os.path.join(
+                    os.environ.get('UPLOAD_FOLDER'), photo_filename
+                ))
 
-            new_id = user.id
-            user = db.session.query(User).get(new_id)
+                user = User(
+                    username=form.username.data,
+                    password=form.password.data,
+                    name=form.fullname.data,
+                    email=form.email.data,
+                    location=form.location.data,
+                    biography=form.biography.data,
 
-            return jsonify(user), 201
+                    photo=photo_filename
+                )
+                db.session.add(user)
+                db.session.commit()
+
+                new_id = user.id
+                user = db.session.query(User).get(new_id)
+
+                user_json = {
+                    "id": user.id,
+                    "username": user.username,
+                    "photo": user.photo,
+                    "name": user.name,
+                    "email": user.email,
+                    "location": user.location,
+                    "biography": user.biography,
+                    "date_joined": user.date_joined
+                }
+
+                return jsonify(user=user_json), 201
+
+            return jsonify(errors=err), 400
 
         return jsonify(errors=form_errors(form)), 400
 
@@ -118,28 +162,27 @@ def register():
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     """Accepts login credentials as username and password"""
-    form = LoginForm()
 
     if request.method == "POST":
+
+        form = LoginForm(obj=request.form)
 
         if form.validate_on_submit():
 
             username = form.username.data
             password = form.password.data
 
-            user = User.query.filter_by(username=username).first()
+            user = db.session.query(User).filter_by(username=username).first()
 
             if user is not None and check_password_hash(user.password, password):
                 # get user id, load into session
                 login_user(user)
 
-                user_name = form.name.data
-                user_id = db.session.query(User).filter_by(
-                    username=user_name).all().id
+                user_id = user.id
 
                 payload = {
                     'sub': user_id,  # subject, usually a unique identifier
-                    'name': user_name,
+                    'name': username,
                     # issued at time
                     'iat': datetime.datetime.now(datetime.timezone.utc),
                     # expiration time
@@ -152,6 +195,8 @@ def login():
                     message="Login Successful",
                     token=jwt
                 ), 200
+
+            return jsonify(errors="failed"), 400
 
         return jsonify(errors=form_errors(form)), 400
 
@@ -175,6 +220,9 @@ def cars():
     jwt_user_id = jwt_payload['sub']
 
     if request.method == 'POST':
+
+        form = CarForm(obj=request.form)
+
         if form.validate_on_submit():
 
             photo = form.photo.data
