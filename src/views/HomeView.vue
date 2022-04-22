@@ -1,7 +1,7 @@
 <template>
-    <div class="home">
+    <div class="container-fluid">
       <div class="d-flex banner">
-        <div class="container col-6 d-flex flex-column">
+        <div class="container col-6 flex-column">
           <h1>{{ message }}</h1>
           <p> United Auto Sales provides the fastest, easiest and most
               user-friendly way to buy or sell cars online. Find a Great Price 
@@ -9,8 +9,8 @@
           </p>
 
           <div class="d-flex row">
-            <button class="btn btn-primary col-5 mx-2">Register</button>
-            <button class="btn btn-primary col-5 mx-2">Login</button>
+            <button @click="register" class="btn btn-primary col-5 mx-2">Register</button>
+            <button @click="login" class="btn btn-primary col-5 mx-2">Login</button>
           </div>
         </div>
         <img alt="Car photo" class="col-6" src="@/assets/banner.jpg" />
@@ -25,10 +25,20 @@ export default {
             message: "Buy and Sell Cars  Online"
         };
     },
+    methods: {
+      register() {
+        // redirect to register page
+        self.$router.push({ path: '/register'});
+      },
+      login() {
+        // redirect to login page
+        self.$router.push({ path: '/login'});
+      }
+    }
 }
 </script>
 
-<style>
+<style scoped>
 .banner {
   width:100%;
   height: auto;
@@ -36,9 +46,6 @@ export default {
 .banner .container {
   width: 25%;
   justify-content: center;
-}
-.home {
-  width: 100%;
 }
 img {
   object-fit: cover;
