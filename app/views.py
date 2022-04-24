@@ -70,6 +70,11 @@ def generate_token(payload):
     return token
 
 
+@app.route('/api/csrf-token', methods=['GET'])
+def get_csrf():
+    return jsonify({'csrf_token': generate_csrf()})
+
+
 ###
 # Routing for your application.
 ###
@@ -77,11 +82,6 @@ def generate_token(payload):
 @app.route('/')
 def index():
     return jsonify(message="This is the beginning of our API")
-
-
-@app.route('/api/csrf-token', methods=['GET'])
-def get_csrf():
-    return jsonify({'csrf_token': generate_csrf()})
 
 
 def username_exists(user_name):
@@ -178,10 +178,8 @@ def login():
                 # get user id, load into session
                 login_user(user)
 
-                user_id = user.id
-
                 payload = {
-                    'sub': user_id,  # subject, usually a unique identifier
+                    'sub': user.id,  # subject, usually a unique identifier
                     'name': username,
                     # issued at time
                     'iat': datetime.datetime.now(datetime.timezone.utc),
@@ -196,7 +194,7 @@ def login():
                     token=jwt
                 ), 200
 
-            return jsonify(errors="failed"), 400
+            return jsonify(errors=["Invalid Credentials"]), 400
 
         return jsonify(errors=form_errors(form)), 400
 
@@ -215,9 +213,6 @@ def logout():
 @requires_auth
 def cars():
     """Returns all cars & adds a new car"""
-
-    jwt_payload = g.current_user
-    jwt_user_id = jwt_payload['sub']
 
     if request.method == 'POST':
 
@@ -241,7 +236,7 @@ def cars():
                 car_type=form.car_type.data,
                 price=form.price.data,
                 photo=form.photo.data,
-                user_id=jwt_user_id
+                user_id=form.user_id.value
             )
             db.session.add(car)
             db.session.commit()
@@ -254,6 +249,7 @@ def cars():
         return jsonify(errors=form_errors(form)), 400
 
     else:
+
         results = db.session.query(Car).all()
 
         if results is not None:
@@ -274,6 +270,8 @@ def cars():
 
             return jsonify(cars=cars), 200
 
+        return jsonify(message="No cars found"), 400
+
 
 @app.route('/api/cars/<car_id>', methods=['GET'])
 @requires_auth
@@ -282,7 +280,7 @@ def get_car(car_id):
     car = db.session.query(Car).get(int(car_id))
 
     if car is not None:
-        return jsonify(car=car), 200
+        return jsonify(car=car.to_dict()), 200
 
     return jsonify(message="Item not found"), 400
 
@@ -311,16 +309,28 @@ def add_favourite_car(car_id):
 @requires_auth
 def search_cars():
     """Search for cars by make or model"""
-    if request.args and 'make' in request.args:
+    if request.args and 'make' in request.args and 'model' in request.args:
+        make = request.args['make']
+        model = request.args['model']
+        cars = db.session.query(Car).filter_by(
+            make=make,
+            model=model
+        ).all()
+        return jsonify(cars=cars.to_dict()), 200
+
+    elif request.args and 'make' in request.args:
         make = request.args['make']
         cars = db.session.query(Car).filter_by(make=make).all()
-        return jsonify(cars=cars), 200
+        return jsonify(cars=cars.to_dict()), 200
+
     elif request.args and 'model' in request.args:
         model = request.args['model']
         cars = db.session.query(Car).filter_by(model=model).all()
-        return jsonify(cars=cars), 200
+        return jsonify(cars=cars.to_dict()), 200
+
     else:
-        return jsonify(message="Query param expected"), 400
+        cars = db.session.query(Car).all()
+        return jsonify(cars=cars.to_dict()), 200
 
 
 @app.route('/api/users/<user_id>', methods=['GET'])
@@ -330,7 +340,7 @@ def get_user(user_id):
     user = db.session.query(User).get(int(user_id))
 
     if user is not None:
-        return jsonify(user=user), 200
+        return jsonify(user=user.to_dict()), 200
 
     return jsonify(message="Item not found"), 404
 
@@ -344,9 +354,14 @@ def get_favourite_car(user_id):
         Favourite).filter_by(user_id=user_id).all()
 
     if user_favourites is not None:
-        return jsonify(favourites=user_favourites), 200
+        return jsonify(favourites=user_favourites.to_dict()), 200
 
     return jsonify(message="Item not found"), 404
+
+
+@app.route('/uploads/<string:filename>')
+def get_image(filename):
+    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'][0:]), filename)
 
 
 # user_loader callback. This callback is used to reload the user object from

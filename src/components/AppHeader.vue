@@ -96,12 +96,31 @@ import { RouterLink } from "vue-router";
       },
       logout() {
         let self = this;
+
+        fetch("/api/auth/logout", {
+          method: 'POST',
+          headers: {
+            "Authorization" : "Bearer " + localStorage.getItem("token"),
+            "Accept" : "application/json"
+          }
+        })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          console.log(data);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
         self.logged_in = false;
         localStorage.removeItem("token");
         // redirect to home page
         self.$router.push({ path: '/'});
+
       }
-    },
+    }
   };
 </script>
 

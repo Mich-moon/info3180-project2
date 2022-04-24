@@ -17,5 +17,5 @@ export default {
 </script>
 
 <style>
-/* Add any component specific styles here */
+
 </style>

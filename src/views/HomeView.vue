@@ -10,7 +10,7 @@
 
           <div class="d-flex row">
             <button @click="register" class="btn btn-primary col-5 mx-2">Register</button>
-            <button @click="login" class="btn btn-primary col-5 mx-2">Login</button>
+            <button @click="login" class="btn btn-success col-5 mx-2">Login</button>
           </div>
         </div>
         <img alt="Car photo" class="col-6" src="@/assets/banner.jpg" />
@@ -27,10 +27,12 @@ export default {
     },
     methods: {
       register() {
+        let self = this;
         // redirect to register page
         self.$router.push({ path: '/register'});
       },
       login() {
+        let self = this;
         // redirect to login page
         self.$router.push({ path: '/login'});
       }

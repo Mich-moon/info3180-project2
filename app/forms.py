@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, IntegerField, DecimalField, SelectField
+from wtforms import StringField, TextAreaField, IntegerField, DecimalField, SelectField, HiddenField
 from wtforms.validators import DataRequired, Length
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 
@@ -47,3 +47,4 @@ class CarForm(FlaskForm):
         FileRequired(),
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
+    user_id = HiddenField('Hidden', validators=[DataRequired()])

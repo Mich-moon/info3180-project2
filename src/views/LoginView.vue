@@ -26,6 +26,7 @@
         <div class="form-control">
             <button class="btn btn-success mb-2">Login</button>
         </div>
+
     </form>
   </div>
 </template>
@@ -56,11 +57,12 @@
                     method: 'POST',
                     body: form_data,
                     headers: {
-                    'X-CSRFToken': self.csrf_token
+                    'X-CSRFToken': self.csrf_token,
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json'
                     }
                 })
                 .then(function (response) {
-                    console.log(response);
                     return response.json();
                 })
                 .then(function (data) {
@@ -87,6 +89,8 @@
                     }
                 })
                 .catch(function (error) {
+                    self.messages = ["Oops. Something went wrong"];
+                    self.msgClass = "alert alert-danger";
                     console.log(error);
                 });
 
@@ -100,7 +104,7 @@
                 console.log(data);
                 self.csrf_token = data.csrf_token;
                 })
-            }
+            }           
         },
     };
 </script>

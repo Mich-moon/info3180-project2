@@ -51,6 +51,7 @@
         <div class="form-control">
             <button class="btn btn-success mb-2">Register</button>
         </div>
+
     </form>
   </div>
 </template>
@@ -81,6 +82,8 @@
                     method: 'POST',
                     body: form_data,
                     headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type' : 'application/json',
                     'X-CSRFToken': self.csrf_token
                     }
                 })
@@ -103,9 +106,10 @@
                     }
                 })
                 .catch(function (error) {
+                    self.messages = ["Oops. Something went wrong"];
+                    self.msgClass = "alert alert-danger";
                     console.log(error);
                 });
-
             },
             getCsrfToken() {
                 let self = this;
@@ -116,8 +120,8 @@
                 console.log(data);
                 self.csrf_token = data.csrf_token;
                 })
-            }
-        },
+            }  
+        }
     };
 </script>
 

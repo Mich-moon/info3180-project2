@@ -27,6 +27,12 @@ form label {
 .form-control button {
     width: 30%;
 }
+.btn-success {
+    background-color: rgb(39, 179, 137);
+}
+.btn-primary {
+    background-color: rgb(61, 165, 235);
+}
 .form-control label {
     margin-bottom: 5px;
 }
@@ -45,36 +51,6 @@ nav,
 .card-footer {
     background-color: var(--theme-green);
 }
-.card-link {
-    text-decoration: none;
-    color: white;
-    text-justify: auto;
-}
-.card p {
-    color: darkgrey;
-}
-#email-owner-btn {
-    background-color: var(--theme-green);
-    color: white;
-    width: 30%;
-}
-#email-owner-btn:hover {
-    background-color: #0b9797;
-}
-select {
-    height: 100%;
-}
-.pill {
-    width: fit-content;
-    height: fit-content;
-    margin: 1em 0em 1em 1em;
-    color: white;
-    font-size: small;
-    padding: 0em 1em 0em 1em;
-}
-.prop-card p {
-    color: black;
-}
 .component {
     border-radius: 20px;
     box-shadow: 2px 5px 8px rgb(170, 170, 170);
@@ -88,5 +64,6 @@ select {
     justify-items: center;
     align-content: center;
 }
+
   
   
