@@ -46,7 +46,7 @@
         </div>
         <div class="form-control">
             <label class="" for="photo">Image Upload</label>
-            <input type="file" name="photo"/>
+            <input type="file" name="photo" id="photo"/>
         </div>
         <div class="form-control">
             <button class="btn btn-success mb-2">Register</button>
@@ -77,10 +77,15 @@
 
                 let registerForm = document.getElementById('registerForm');
                 let form_data = new FormData(registerForm);
+                //console.log(document.getElementById('photo').files[0].name);
+                form_data.set('photo', document.getElementById('photo').files[0].name);
+
+                let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
+                console.log(form_data_json);
 
                 fetch("/api/register", {
                     method: 'POST',
-                    body: form_data,
+                    body: form_data_json,
                     headers: {
                     'Accept' : 'application/json',
                     'Content-Type' : 'application/json',
@@ -103,6 +108,9 @@
                         self.msgClass = "alert alert-success";               
                         console.log(self.messages);
                         registerForm.reset();  // clear form
+
+                        // redirect to home page
+                        self.$router.push({ path: '/login'});
                     }
                 })
                 .catch(function (error) {

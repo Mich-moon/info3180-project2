@@ -70,22 +70,10 @@
         data() {
             return {
                 csrf_token: "",
-                logged_in: false,
                 id: null,
                 messages: [],
                 msgClass: '',
-                car: {
-                    id: 0,
-                    photo: "",
-                    year: 2019,
-                    make: "Honda",
-                    model: "Civic",
-                    description: "someting here",
-                    colour: "red",
-                    car_type: "care type here",
-                    price: 7000.0,
-                    transmission: "transmission here",
-                }
+                car: {}
             };
         },
         created() {
@@ -101,7 +89,7 @@
                     self.logged_in = true;
 
                     // retrieve user id from token stored in localstorage
-                    let jwt_token = localStorage.getItem("token");
+                    let jwt_token = JSON.parse( localStorage.getItem("token") );
 
                     var base64Url = jwt_token.split('.')[1];
                     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -113,7 +101,6 @@
                     self.id = jwt_payload['sub'];
 
                 } else {
-                    self.logged_in = false;
                     // redirect to home page
                     self.$router.push({ path: '/'});
                 }
@@ -133,11 +120,21 @@
                 .then(function (data) {
                     console.log(data);
 
-                    if ("errors" in data) {
-                        // redirect to home page
-                        this.$router.push({ path: "/" });
-                    } else {
+                    if ("car" in data) {
                         self.car = data.car;
+                    } else {
+                        self.car = {
+                            "id": "",
+                            "photo": "",
+                            "year": "",
+                            "make": "",
+                            "model": "",
+                            "description": "",
+                            "colour": "",
+                            "car_type": "",
+                            "price": "",
+                            "transmission": "",
+                        };
                     }
                 });
             },

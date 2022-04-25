@@ -9,11 +9,11 @@
             <div class="form-group">
                 <div class="form-control">
                     <label class="" for="make">Make</label>
-                    <input v-model="make" name="make" id="make"/>
+                    <input name="make" id="make"/>
                 </div>
                 <div class="form-control">
                     <label class="" for="model">Model</label>
-                    <input v-model="model" name="model" id="model"/>
+                    <input name="model" id="model"/>
                 </div>
                 <button class="btn btn-success mb-2">Search</button>
             </div>
@@ -40,22 +40,15 @@
         components: { CarCard },
         data() {
             return {
-                make: '',
-                model: '',
+                csrf_token: '',
                 search_path: '',
-                results: [{
-                    'id': 0,
-                    'photo': '', 
-                    'year': 2019, 
-                    'make': 'Honda', 
-                    'model': 'Civic', 
-                    'price': 7000.00
-                }]
-                //results: []
+                results: []
             }
         },
         created() {
           this.isLoggedIn();
+          this.getCsrfToken();
+          this.getCars();
         },
         methods: {
             isLoggedIn() {
@@ -63,33 +56,74 @@
 
               if (localStorage.getItem("token")) {
                 self.logged_in = true;
-
+                
               } else {
-                self.logged_in = false;
+                // redirect to home page
+                self.$router.push({ path: '/'});
               }
+            },
+            getCars() {
+                let self = this;
+
+                fetch("/api/cars", {
+                    method: 'GET',
+                    headers: {
+                        'Authorization' : 'Bearer ' + localStorage.getItem("token"),
+                        'Accept' : 'application/json',
+                        'X-CSRFToken': self.csrf_token
+                    },
+                })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if ("cars" in data) {
+                        console.log(data);
+                        self.results = JSON.parse(data.cars).slice(0,2);
+                    } else {
+                        self.results =  [{
+                            'id': '',
+                            'photo': '', 
+                            'year': '', 
+                            'make': '', 
+                            'model': '', 
+                            'price': ''
+                        }];
+                    }
+                })
+                .catch(function (error) {
+                    self.results = [error];
+                    console.log(error);
+                });
             },
             search() {
                 let self = this;
 
-                if (make.length == 0 && model.length == 0) {
-                  self.search_path = "/api/search" +  id;
+                let make = document.getElementById('make').value;
+                let model = document.getElementById('model').value;
+
+                console.log(make);
+                console.log(model);
+
+                if (make == '' && model == '') {
+                  self.search_path = "/api/search";
 
                 } else if (make.length == 0) {
-                  self.search_path = "/api/search/?model=" +  self.model;
+                  self.search_path = "/api/search/?model=" +  model;
 
                 } else if (model.length == 0) {
-                  self.search_path = "/api/search/?make=" +  self.make;
+                  self.search_path = "/api/search/?make=" +  make;
 
                 } else {
-                  self.search_path = "/api/search/?make=" +  self.make + "&model=" + self.model;
+                  self.search_path = "/api/search/?make=" +  make + "&model=" + model;
 
                 }
 
                 fetch(self.search_path, {
-                    method: 'GET',
                     headers: {
-                        "Authorization" : "Bearer " + localStorage.getItem("token"),
-                        "Accept" : "application/json"
+                        'Authorization' : 'Bearer ' + localStorage.getItem("token"),
+                        'Accept' : 'application/json',
+                        'X-CSRFToken' : self.csrf_token
                     }
                 })
                 .then(function (response) {
@@ -97,15 +131,35 @@
                     return response.json();
                 })
                 .then(function (data) {
-                    console.log(data);
-
-                    this.results = JSON.parse(data.results);
+                    if ("cars" in data) {
+                        console.log(data);
+                        self.results = JSON.parse(data.cars);
+                    } else {
+                        self.results =  [{
+                            'id': '',
+                            'photo': '', 
+                            'year': '', 
+                            'make': '', 
+                            'model': '', 
+                            'price': ''
+                        }];
+                    }
                 })
                 .catch(function (error) {
                     self.results = [error];
                     console.log(error);
                 });
 
+            },
+            getCsrfToken() {
+                let self = this;
+
+                fetch("/api/csrf-token")
+                .then((response) => response.json())
+                .then((data) => {
+                console.log(data);
+                self.csrf_token = data.csrf_token;
+                })
             }
         }
     };

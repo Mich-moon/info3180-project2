@@ -37,7 +37,8 @@
             return {
                 csrf_token: '',
                 messages: [],
-                msgClass: ''
+                msgClass: '',
+                logged_in: false
             }
         },
         created() {
@@ -52,10 +53,13 @@
 
                 let loginForm = document.getElementById('loginForm');
                 let form_data = new FormData(loginForm);
+                //console.log(form_data);
+                let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
+                //console.log(form_data_json);
 
                 fetch("/api/auth/login", {
                     method: 'POST',
-                    body: form_data,
+                    body: form_data_json,
                     headers: {
                     'X-CSRFToken': self.csrf_token,
                     'Accept' : 'application/json',
@@ -69,19 +73,22 @@
                     console.log(data);
 
                     if ("errors" in data){
-                        self.messages = ["Login Failed"];
+                        self.messages = data.errors;
                         self.msgClass = "alert alert-danger";
                         console.log(self.messages);
                     } else if ("token" in data) {
                         self.messages = ["Login Successful"];
                         self.msgClass = "alert alert-success";               
                         console.log(self.messages);
+                        loginForm.reset();  // clear form
 
                         let jwt_token = data.token;
 
                         // We store this token in localStorage so that subsequent API requests
                         // can use the token until it expires or is deleted.
-                        localStorage.setItem("token", jwt_token);
+                        localStorage.setItem("token", JSON.stringify(jwt_token));
+                        
+                        self.logged_in = true;
 
                         // redirect to explore page
                         self.$router.push({ path: '/explore'});

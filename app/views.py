@@ -142,14 +142,14 @@ def register():
                 user = db.session.query(User).get(new_id)
 
                 user_json = {
-                    "id": user.id,
-                    "username": user.username,
-                    "photo": user.photo,
-                    "name": user.name,
-                    "email": user.email,
-                    "location": user.location,
-                    "biography": user.biography,
-                    "date_joined": user.date_joined
+                    'id': user.id,
+                    'username': user.username,
+                    'photo': user.photo,
+                    'name': user.name,
+                    'email': user.email,
+                    'location': user.location,
+                    'biography': user.biography,
+                    'date_joined': user.date_joined
                 }
 
                 return jsonify(user=user_json), 201
@@ -200,8 +200,7 @@ def login():
 
 
 @app.route('/api/auth/logout', methods=['POST'])
-@login_required
-@requires_auth
+# @requires_auth
 def logout():
     """Logs out a user"""
     # Logout the user and end the session
@@ -210,7 +209,7 @@ def logout():
 
 
 @app.route('/api/cars', methods=['POST', 'GET'])
-@requires_auth
+# @requires_auth
 def cars():
     """Returns all cars & adds a new car"""
 
@@ -244,7 +243,21 @@ def cars():
             new_id = car.id
             car = db.session.query(Car).get(new_id)
 
-            return jsonify(car=car), 201
+            car_json = {
+                "id": car.id,
+                "description": car.description,
+                "make": car.make,
+                "model": car.model,
+                "colour": car.colour,
+                "year": car.year,
+                "transmission": car.transmission,
+                "car_type": car.car_type,
+                "price": car.price,
+                "photo": car.photo,
+                "user_id": car.user_id
+            }
+
+            return jsonify(car=car_json), 201
 
         return jsonify(errors=form_errors(form)), 400
 
@@ -274,19 +287,34 @@ def cars():
 
 
 @app.route('/api/cars/<car_id>', methods=['GET'])
-@requires_auth
+# @requires_auth
 def get_car(car_id):
     """Get Details of a specific car"""
     car = db.session.query(Car).get(int(car_id))
 
     if car is not None:
-        return jsonify(car=car.to_dict()), 200
+
+        car_json = {
+            "id": car.id,
+            "description": car.description,
+            "make": car.make,
+            "model": car.model,
+            "colour": car.colour,
+            "year": car.year,
+            "transmission": car.transmission,
+            "car_type": car.car_type,
+            "price": car.price,
+            "photo": car.photo,
+            "user_id": car.user_id
+        }
+
+        return jsonify(car=car_json), 200
 
     return jsonify(message="Item not found"), 400
 
 
 @app.route('/api/cars/<car_id>/favourite', methods=['POST'])
-@requires_auth
+# @requires_auth
 def add_favourite_car(car_id):
     """Add car to Favourites for logged in user"""
     jwt_payload = g.current_user
@@ -306,7 +334,7 @@ def add_favourite_car(car_id):
 
 
 @app.route('/api/search', methods=['GET'])
-@requires_auth
+# @requires_auth
 def search_cars():
     """Search for cars by make or model"""
     if request.args and 'make' in request.args and 'model' in request.args:
@@ -320,33 +348,87 @@ def search_cars():
 
     elif request.args and 'make' in request.args:
         make = request.args['make']
-        cars = db.session.query(Car).filter_by(make=make).all()
-        return jsonify(cars=cars.to_dict()), 200
+        results = db.session.query(Car).filter_by(make=make).all()
+        cars = [{
+            "id": c.id,
+            "description": c.description,
+            "make": c.make,
+            "model": c.model,
+            "colour": c.colour,
+            "year": c.year,
+            "transmission": c.transmission,
+            "car_type": c.car_type,
+            "price": c.price,
+            "photo": c.photo,
+            "user_id": c.user_id
+        } for c in results]
+
+        return jsonify(cars=cars), 200
 
     elif request.args and 'model' in request.args:
         model = request.args['model']
-        cars = db.session.query(Car).filter_by(model=model).all()
-        return jsonify(cars=cars.to_dict()), 200
+        results = db.session.query(Car).filter_by(model=model).all()
+        cars = [{
+            "id": c.id,
+            "description": c.description,
+            "make": c.make,
+            "model": c.model,
+            "colour": c.colour,
+            "year": c.year,
+            "transmission": c.transmission,
+            "car_type": c.car_type,
+            "price": c.price,
+            "photo": c.photo,
+            "user_id": c.user_id
+        } for c in results]
+
+        return jsonify(cars=cars), 200
 
     else:
-        cars = db.session.query(Car).all()
-        return jsonify(cars=cars.to_dict()), 200
+        results = db.session.query(Car).all()
+        cars = [{
+            "id": c.id,
+            "description": c.description,
+            "make": c.make,
+            "model": c.model,
+            "colour": c.colour,
+            "year": c.year,
+            "transmission": c.transmission,
+            "car_type": c.car_type,
+            "price": c.price,
+            "photo": c.photo,
+            "user_id": c.user_id
+        } for c in results]
+
+        return jsonify(cars=cars), 200
 
 
 @app.route('/api/users/<user_id>', methods=['GET'])
-@requires_auth
+# @requires_auth
 def get_user(user_id):
     """Get Details of a user"""
     user = db.session.query(User).get(int(user_id))
 
     if user is not None:
-        return jsonify(user=user.to_dict()), 200
+
+        user_json = {
+            "id": user.id,
+            "username": user.username,
+            "photo": user.photo,
+            "name": user.name,
+            "email": user.email,
+            "location": user.location,
+            "biography": user.biography,
+            "date_joined": user.date_joined
+        }
+
+        return jsonify(user=user_json), 200
 
     return jsonify(message="Item not found"), 404
 
 
 @app.route('/api/users/<user_id>/favourites', methods=['GET'])
-@requires_auth
+# @requires_auth
 def get_favourite_car(user_id):
     """Get cars that a user has favourited"""
     #user_favourites = Favourite.query.filter_by(user_id=user_id).all()
@@ -354,18 +436,28 @@ def get_favourite_car(user_id):
         Favourite).filter_by(user_id=user_id).all()
 
     if user_favourites is not None:
-        return jsonify(favourites=user_favourites.to_dict()), 200
+
+        favs = [{
+            "id": f.id,
+            "car_id": f.car_id,
+            "user_id": f.user_id
+        } for f in user_favourites]
+
+        return jsonify(favourites=favs), 200
 
     return jsonify(message="Item not found"), 404
 
 
-@app.route('/uploads/<string:filename>')
+@app.route('/api/uploads/<string:filename>')
 def get_image(filename):
-    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'][0:]), filename)
-
+    path = send_from_directory(os.path.join(
+        os.getcwd(), app.config['UPLOAD_FOLDER'][0:]), filename)
+    return jsonify({"path": path}), 200
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
+
+
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))

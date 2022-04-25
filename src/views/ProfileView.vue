@@ -2,7 +2,7 @@
     <div class="container-fluid d-flex flex-column">
         <div class="row px-0 component mb-5 px-2">
             <div class="col-4 mx-0 p-2">
-                <img class="card-img-top rounded-circle" src="{{ user.photo }}" />
+                <img class="card-img-top rounded-circle" :src="photo_url" />
             </div>
             <div class="col-8 mx-0 p-2">
                 <div>
@@ -41,27 +41,10 @@
         data() {
             return {
                 csrf_token: "",
-                logged_in: false,
                 id: null,
-                user: {
-                    id: 0,
-                    photo: "",
-                    name: "Patricia Clark",
-                    username: "dpatrick",
-                    biography: "someting here",
-                    email: "p@yahoo.com",
-                    location: "Jamaica",
-                    date_joined: "January",
-                },
-                results: [{
-                    'id': 0,
-                    'photo': '', 
-                    'year': 2019, 
-                    'make': 'Honda', 
-                    'model': 'Civic', 
-                    'price': 7000.00
-                }]
-                //results: []
+                user: {},
+                results: [],
+                photo_url: 'https://frameartjamaica.com/wp-content/uploads/2018/07/placeholder-img-1.jpg'
             };
         },
         created() {
@@ -78,7 +61,7 @@
                     self.logged_in = true;
 
                     // retrieve user id from token stored in localstorage
-                    let jwt_token = localStorage.getItem("token");
+                    let jwt_token = JSON.parse( localStorage.getItem("token") );
 
                     var base64Url = jwt_token.split('.')[1];
                     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -90,7 +73,6 @@
                     self.id = jwt_payload['sub'];
 
                 } else {
-                    self.logged_in = false;
                     // redirect to home page
                     self.$router.push({ path: '/'});
                 }
@@ -98,10 +80,11 @@
             getUser() {
                 let self = this;
 
-                fetch("/api/users/" + this.user_id, {
+                fetch("/api/users/" + self.id, {
                     headers: {
                         Authorization: "Bearer " + localStorage.getItem("token"),
                         Accept: "application/json",
+                        'X-CSRFToken': self.csrf_token
                     },
                 })
                 .then(function (response) {
@@ -110,13 +93,33 @@
                 .then(function (data) {
                     console.log(data);
 
-                    if ("errors" in data) {
-                        // redirect to home page
-                        this.$router.push({ path: "/" });
-                    } else {
+                    if ("user" in data) {
                         self.user = data.user;
+                    } else {
+                        self.user = {
+                            "id": "",
+                            "photo": "",
+                            "name": "",
+                            "username": "",
+                            "biography": "",
+                            "email": "",
+                            "location": "",
+                            "date_joined": "",
+                        };
                     }
                 });
+
+                if (self.user.id != "") {
+                    fetch("/api/uploads/?filename=" + self.user.photo)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if ("path" in data) {
+                            console.log(data.path);
+                            self.photo_url = data.path;
+                        } 
+                    })
+                }
+
             },
             getFavourites(){
                 let self = this;
@@ -134,7 +137,18 @@
                 .then(function (data) {
                     console.log(data);
 
-                    this.results = JSON.parse(data.results);
+                    if ("favourites" in data) {
+                        self.results = data.favourites;
+                    } else {
+                        self.results =  [{
+                            'id': '',
+                            'photo': 'https://frameartjamaica.com/wp-content/uploads/2018/07/placeholder-img-1.jpg', 
+                            'year': '', 
+                            'make': '', 
+                            'model': '', 
+                            'price': ''
+                        }];
+                    }
                 })
                 .catch(function (error) {
                     self.results = [error];

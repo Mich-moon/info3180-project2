@@ -24,7 +24,6 @@ class RegisterForm(FlaskForm):
                            DataRequired(), Length(1, 100)])
     biography = TextAreaField('Biography', validators=[DataRequired()])
     photo = FileField('Image upload', validators=[
-        FileRequired(),
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
 
@@ -44,7 +43,6 @@ class CarForm(FlaskForm):
     price = DecimalField('Price', places=2, validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     photo = FileField('Image upload', validators=[
-        FileRequired(),
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
     user_id = HiddenField('Hidden', validators=[DataRequired()])

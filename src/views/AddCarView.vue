@@ -69,7 +69,7 @@
         </div>
         <div class="form-control">
             <label class="" for="photo">Upload Photo</label>
-            <input type="file" name="photo"/>
+            <input type="file" name="photo" id="photo"/>
         </div>
         <div class="form-control">
             <button class="btn btn-success mb-2">Save</button>
@@ -86,7 +86,6 @@
         data() {
             return {
                 csrf_token: '',
-                logged_in: false,
                 messages: [],
                 msgClass: '',
                 id: null
@@ -104,7 +103,7 @@
                     self.logged_in = true;
 
                     // retrieve user id from token stored in localstorage
-                    let jwt_token = localStorage.getItem("token");
+                    let jwt_token = JSON.parse( localStorage.getItem("token") );
 
                     var base64Url = jwt_token.split('.')[1];
                     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -116,7 +115,6 @@
                     self.id = jwt_payload['sub'];
 
                 } else {
-                    self.logged_in = false;
                     // redirect to home page
                     self.$router.push({ path: '/'});
                 }
@@ -129,12 +127,15 @@
 
                 let carForm = document.getElementById('carForm');
                 let form_data = new FormData(carForm);
-
-                console.log(self.csrf_token);
+                //console.log(document.getElementById('photo').files[0].name);
+                form_data.set('photo', document.getElementById('photo').files[0].name);
+                
+                let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
+                console.log(form_data_json);
 
                 fetch("/api/cars", {
                     method: 'POST',
-                    body: form_data,
+                    body: form_data_json,
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem("token"),
                         'Accept' : 'application/json',
@@ -157,6 +158,7 @@
                         self.messages = ["Car Added Successfully"];
                         self.msgClass = "alert alert-success";               
                         console.log(self.messages);
+                        carForm.reset();  // clear form
                     }
                 })
                 .catch(function (error) {

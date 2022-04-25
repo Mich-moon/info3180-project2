@@ -16,7 +16,7 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto" v-if="(logged_in == true)">
+          <ul class="navbar-nav me-auto" v-if="logged_in">
             <li class="nav-item">
               <span class="mx-4"/><span class="mx-4"/>
             </li>
@@ -27,7 +27,7 @@
               <RouterLink class="nav-link" to="/explore">Explore</RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink class="nav-link" to="/users/ + id">My Profile</RouterLink>
+              <RouterLink class="nav-link" :to="{name: 'profile', params: {user_id: id} }">My Profile</RouterLink>
             </li>
           </ul>
           <ul class="navbar-nav me-auto" v-else>
@@ -61,18 +61,21 @@ import { RouterLink } from "vue-router";
   export default {
     data() {
       return {
-        logged_in: false, 
-        profile_route: ""
+        logged_in: this.logged_in,
+        id: null
       }
     },
     created() {
       this.isLoggedIn();
+      console.log(this.logged_in);
+
     },
     methods: {
       isLoggedIn() {
         let self = this;
 
         if (localStorage.getItem("token")) {
+
           self.logged_in = true;
 
           // retrieve user id from token stored in localstorage
@@ -85,14 +88,9 @@ import { RouterLink } from "vue-router";
           }).join(''));
 
           let jwt_payload = JSON.parse(jsonPayload);
-          let id = jwt_payload['sub'];
-          console.log(id);
-
-          self.profile_route = "/users/" +  id;
-
-        } else {
-          self.logged_in = false;
-        }
+          self.id = jwt_payload['sub'];
+          console.log(self.id);
+        } 
       },
       logout() {
         let self = this;
@@ -100,8 +98,8 @@ import { RouterLink } from "vue-router";
         fetch("/api/auth/logout", {
           method: 'POST',
           headers: {
-            "Authorization" : "Bearer " + localStorage.getItem("token"),
-            "Accept" : "application/json"
+            'Authorization' : 'Bearer ' + localStorage.getItem("token"),
+            'Accept' : 'application/json'
           }
         })
         .then(function (response) {
@@ -109,16 +107,23 @@ import { RouterLink } from "vue-router";
         })
         .then(function (data) {
           console.log(data);
+          if ("message" in data){
+
+            self.logged_in = false;
+            localStorage.removeItem("token");
+            // redirect to home page
+            self.$router.push({ path: '/'});
+          }
         })
         .catch(function (error) {
           console.log(error);
         });
 
+        // TO BE REMOVED
         self.logged_in = false;
         localStorage.removeItem("token");
         // redirect to home page
         self.$router.push({ path: '/'});
-
       }
     }
   };
