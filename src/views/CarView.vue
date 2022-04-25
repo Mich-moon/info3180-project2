@@ -74,7 +74,7 @@
                 messages: [],
                 msgClass: '',
                 car: {},
-                photo_url: 'https://frameartjamaica.com/wp-content/uploads/2018/07/placeholder-img-1.jpg'
+                photo_url: ''
             };
         },
         created() {

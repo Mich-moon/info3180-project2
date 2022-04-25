@@ -81,7 +81,7 @@ def get_csrf():
 
 @app.route('/')
 def index():
-    return send_file(os.path.join('../dist/', 'index.html'))
+    return return jsonify(message="message")
 
 
 def username_exists(user_name):
@@ -200,7 +200,7 @@ def login():
 
 
 @app.route('/api/auth/logout', methods=['POST'])
-# @requires_auth
+@requires_auth
 def logout():
     """Logs out a user"""
     # Logout the user and end the session
@@ -209,7 +209,7 @@ def logout():
 
 
 @app.route('/api/cars', methods=['POST', 'GET'])
-# @requires_auth
+@requires_auth
 def cars():
     """Returns all cars & adds a new car"""
 
@@ -287,7 +287,7 @@ def cars():
 
 
 @app.route('/api/cars/<car_id>', methods=['GET'])
-# @requires_auth
+@requires_auth
 def get_car(car_id):
     """Get Details of a specific car"""
     car = db.session.query(Car).get(int(car_id))
@@ -314,7 +314,7 @@ def get_car(car_id):
 
 
 @app.route('/api/cars/<car_id>/favourite', methods=['POST'])
-# @requires_auth
+@requires_auth
 def add_favourite_car(car_id):
     """Add car to Favourites for logged in user"""
     jwt_payload = g.current_user
@@ -334,7 +334,7 @@ def add_favourite_car(car_id):
 
 
 @app.route('/api/search', methods=['GET'])
-# @requires_auth
+@requires_auth
 def search_cars():
     """Search for cars by make or model"""
     if request.args and 'make' in request.args and 'model' in request.args:
@@ -404,7 +404,7 @@ def search_cars():
 
 
 @app.route('/api/users/<user_id>', methods=['GET'])
-# @requires_auth
+@requires_auth
 def get_user(user_id):
     """Get Details of a user"""
     user = db.session.query(User).get(int(user_id))
@@ -428,7 +428,7 @@ def get_user(user_id):
 
 
 @app.route('/api/users/<user_id>/favourites', methods=['GET'])
-# @requires_auth
+@requires_auth
 def get_favourite_car(user_id):
     """Get cars that a user has favourited"""
     #user_favourites = Favourite.query.filter_by(user_id=user_id).all()
