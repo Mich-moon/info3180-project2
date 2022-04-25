@@ -11,7 +11,7 @@
 
     <div class="row px-0 component mb-5 px-2">
       <div class="col-5 mx-0 p-2">
-        <img class="card-img-top" src="{{ car.photo }}" />
+        <img class="card-img-top" :src="photo_url" />
       </div>
       <div class="col-7 mx-0 p-2">
         <div>
@@ -73,7 +73,8 @@
                 id: null,
                 messages: [],
                 msgClass: '',
-                car: {}
+                car: {},
+                photo_url: 'https://frameartjamaica.com/wp-content/uploads/2018/07/placeholder-img-1.jpg'
             };
         },
         created() {
@@ -179,6 +180,18 @@
                 .catch(function (error) {
                 console.log(error);
                 });
+
+                if (self.car.id != "") {
+                    fetch("/api/uploads/?filename=" + self.car.photo)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if ("path" in data) {
+                            console.log(data.path);
+                            self.photo_url = data.path;
+                        } 
+                    })
+                }
+
             },
             getCsrfToken() {
                 let self = this;
