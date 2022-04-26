@@ -69,7 +69,6 @@
                     method: 'GET',
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem("token"),
-                        'Accept' : 'application/json',
                         'X-CSRFToken': self.csrf_token
                     },
                 })
@@ -122,7 +121,6 @@
                 fetch(self.search_path, {
                     headers: {
                         'Authorization' : 'Bearer ' + localStorage.getItem("token"),
-                        'Accept' : 'application/json',
                         'X-CSRFToken' : self.csrf_token
                     }
                 })

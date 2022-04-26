@@ -83,7 +83,6 @@
                 fetch("/api/users/" + self.id, {
                     headers: {
                         Authorization: "Bearer " + localStorage.getItem("token"),
-                        Accept: "application/json",
                         'X-CSRFToken': self.csrf_token
                     },
                 })
@@ -126,8 +125,7 @@
 
                 fetch("/api/users/" + self.id + "/favourites", {
                     headers: {
-                        "Authorization" : "Bearer " + localStorage.getItem("token"),
-                        "Accept" : "application/json"
+                        "Authorization" : "Bearer " + localStorage.getItem("token")
                     }
                 })
                 .then(function (response) {

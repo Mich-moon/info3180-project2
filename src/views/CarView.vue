@@ -1,12 +1,11 @@
 <template>
   <div class="container-fluid d-flex flex-column">
-
     <div id="messages" :class="msgClass" :v-if="msgClass">
-        <ul class="msg__list">
-            <li v-for="(message, index) in messages" :key="index" class="msg__item">  
-                {{ message }}
-            </li>
-        </ul>
+      <ul class="msg__list">
+        <li v-for="(message, index) in messages" :key="index" class="msg__item">
+          {{ message }}
+        </li>
+      </ul>
     </div>
 
     <div class="row px-0 component mb-5 px-2">
@@ -66,145 +65,146 @@
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
-                csrf_token: "",
-                id: null,
-                messages: [],
-                msgClass: '',
-                car: {},
-                photo_url: ''
-            };
-        },
-        created() {
-            this.isLoggedIn();
-            this.getCsrfToken();
-            this.getCar();
-        },
-        methods: {
-            isLoggedIn() {
-                let self = this;
-
-                if (localStorage.getItem("token")) {
-                    self.logged_in = true;
-
-                    // retrieve user id from token stored in localstorage
-                    let jwt_token = JSON.parse( localStorage.getItem("token") );
-
-                    var base64Url = jwt_token.split('.')[1];
-                    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                    }).join(''));
-
-                    let jwt_payload = JSON.parse(jsonPayload);
-                    self.id = jwt_payload['sub'];
-
-                } else {
-                    // redirect to home page
-                    self.$router.push({ path: '/'});
-                }
-            },
-            getCar() {
-                let self = this;
-
-                fetch("/api/cars/" + this.id, {
-                    headers: {
-                        Authorization: "Bearer " + localStorage.getItem("token"),
-                        Accept: "application/json"
-                    },
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    console.log(data);
-
-                    if ("car" in data) {
-                        self.car = data.car;
-                    } else {
-                        self.car = {
-                            "id": "",
-                            "photo": "",
-                            "year": "",
-                            "make": "",
-                            "model": "",
-                            "description": "",
-                            "colour": "",
-                            "car_type": "",
-                            "price": "",
-                            "transmission": "",
-                        };
-                    }
-                });
-            },
-            email() {
-                console.log("cannot send email");
-            },
-            like() {
-                let self = this;
-
-                self.messages = [];
-                self.msgClass = "";
-
-                fetch("/api/cars/" + this.id + "/favourite", {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": self.csrf_token,
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                    }
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    console.log(data);
-
-                    if ("car_id" in data) {
-                        let like = document.getElementById("like-btn");
-                        like.style.backgroundColor = "DeepPink";
-                        console.log("data.message");
-
-                        self.messages = ["Car Favourited Successfully"];
-                        self.msgClass = "alert alert-success";               
-                        console.log(self.messages);
-
-                    } else {
-                        self.messages = ["Error. Failed to save"];
-                        self.msgClass = "alert alert-danger";
-                        console.log(self.messages);
-                    }
-                })
-                .catch(function (error) {
-                console.log(error);
-                });
-
-                if (self.car.id != "") {
-                    fetch("/api/uploads/?filename=" + self.car.photo)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        if ("path" in data) {
-                            console.log(data.path);
-                            self.photo_url = data.path;
-                        } 
-                    })
-                }
-
-            },
-            getCsrfToken() {
-                let self = this;
-
-                fetch("/api/csrf-token")
-                .then((response) => response.json())
-                .then((data) => {
-                console.log(data);
-                self.csrf_token = data.csrf_token;
-                })
-            }
-        },
+export default {
+  data() {
+    return {
+      csrf_token: "",
+      id: null,
+      messages: [],
+      msgClass: "",
+      car: {},
+      photo_url: "",
     };
+  },
+  created() {
+    this.isLoggedIn();
+    this.getCsrfToken();
+    this.getCar();
+  },
+  methods: {
+    isLoggedIn() {
+      let self = this;
+
+      if (localStorage.getItem("token")) {
+        self.logged_in = true;
+
+        // retrieve user id from token stored in localstorage
+        let jwt_token = JSON.parse(localStorage.getItem("token"));
+
+        var base64Url = jwt_token.split(".")[1];
+        var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        var jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map(function (c) {
+              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join("")
+        );
+
+        let jwt_payload = JSON.parse(jsonPayload);
+        self.id = jwt_payload["sub"];
+      } else {
+        // redirect to home page
+        self.$router.push({ path: "/" });
+      }
+    },
+    getCar() {
+      let self = this;
+
+      fetch("/api/cars/" + this.id, {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("token"),
+          Accept: "application/json",
+        },
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          console.log(data);
+
+          if ("car" in data) {
+            self.car = data.car;
+          } else {
+            self.car = {
+              id: "",
+              photo: "",
+              year: "",
+              make: "",
+              model: "",
+              description: "",
+              colour: "",
+              car_type: "",
+              price: "",
+              transmission: "",
+            };
+          }
+        });
+    },
+    email() {
+      console.log("cannot send email");
+    },
+    like() {
+      let self = this;
+
+      self.messages = [];
+      self.msgClass = "";
+
+      fetch("/api/cars/" + this.id + "/favourite", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": self.csrf_token,
+          Accept: "application/json",
+        },
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          console.log(data);
+
+          if ("car_id" in data) {
+            let like = document.getElementById("like-btn");
+            like.style.backgroundColor = "DeepPink";
+            console.log("data.message");
+
+            self.messages = ["Car Favourited Successfully"];
+            self.msgClass = "alert alert-success";
+            console.log(self.messages);
+          } else {
+            self.messages = ["Error. Failed to save"];
+            self.msgClass = "alert alert-danger";
+            console.log(self.messages);
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      if (self.car.id != "") {
+        fetch("/api/uploads/?filename=" + self.car.photo)
+          .then((response) => response.json())
+          .then((data) => {
+            if ("path" in data) {
+              console.log(data.path);
+              self.photo_url = data.path;
+            }
+          });
+      }
+    },
+    getCsrfToken() {
+      let self = this;
+
+      fetch("/api/csrf-token")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          self.csrf_token = data.csrf_token;
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>

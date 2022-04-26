@@ -87,8 +87,6 @@
                     method: 'POST',
                     body: form_data_json,
                     headers: {
-                    'Accept' : 'application/json',
-                    'Content-Type' : 'application/json',
                     'X-CSRFToken': self.csrf_token
                     }
                 })
