@@ -36,13 +36,16 @@ class CarForm(FlaskForm):
     colour = StringField('Colour', validators=[
         DataRequired(), Length(1, 20)])
     year = IntegerField('Year', validators=[DataRequired()])
-    transmission = StringField('Transmission', validators=[
-        DataRequired(), Length(1, 50)])
-    car_type = StringField('Car Type', validators=[
-        DataRequired(), Length(1, 50)])
+    transmission = SelectField('Transmission', choices=[
+        'automatic', 'manual', 'continuously variable', 'semi-automatic and dual-clutch'], validators=[
+        DataRequired()])
+    car_type = SelectField('Car Type', choices=[
+        'suv', 'pickup truck', 'convertible', 'coupe', 'muv', 'sedan', 'hatchback'], validators=[
+        DataRequired()])
     price = DecimalField('Price', places=2, validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     photo = FileField('Image upload', validators=[
+        DataRequired(),
         FileAllowed(['jpg', 'png', 'jpeg'], 'Images only!')
     ])
     user_id = HiddenField('Hidden', validators=[DataRequired()])

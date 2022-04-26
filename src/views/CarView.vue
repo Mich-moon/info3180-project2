@@ -10,7 +10,7 @@
 
     <div class="row px-0 component mb-5 px-2">
       <div class="col-5 mx-0 p-2">
-        <img class="card-img-top" :src="photo_url" />
+        <img class="card-img-top" :src="car.photo" />
       </div>
       <div class="col-7 mx-0 p-2">
         <div>
@@ -66,14 +66,14 @@
 
 <script>
 export default {
+  props: [ 'car_id' ],
   data() {
     return {
       csrf_token: "",
-      id: null,
+      user_id: null,
       messages: [],
       msgClass: "",
-      car: {},
-      photo_url: "",
+      car: {}
     };
   },
   created() {
@@ -103,7 +103,7 @@ export default {
         );
 
         let jwt_payload = JSON.parse(jsonPayload);
-        self.id = jwt_payload["sub"];
+        self.user_id = jwt_payload["sub"];
       } else {
         // redirect to home page
         self.$router.push({ path: "/" });
@@ -112,22 +112,23 @@ export default {
     getCar() {
       let self = this;
 
-      fetch("/api/cars/" + this.id, {
+      fetch("/api/cars/" + self.car_id, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
           Accept: "application/json",
         },
       })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          console.log(data);
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
 
-          if ("car" in data) {
-            self.car = data.car;
-          } else {
-            self.car = {
+        if ("car" in data) {
+          let car = data.car;
+          self.car = car;
+          console.log(self.car);
+        } else {
+          self.car = {
               id: "",
               photo: "",
               year: "",
@@ -138,9 +139,10 @@ export default {
               car_type: "",
               price: "",
               transmission: "",
-            };
-          }
-        });
+          };
+        }
+      });
+
     },
     email() {
       console.log("cannot send email");
@@ -151,17 +153,17 @@ export default {
       self.messages = [];
       self.msgClass = "";
 
-      fetch("/api/cars/" + this.id + "/favourite", {
+      fetch("/api/cars/" + self.user_id + "/favourite", {
         method: "POST",
         headers: {
           "X-CSRFToken": self.csrf_token,
           Accept: "application/json",
         },
       })
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
           console.log(data);
 
           if ("car_id" in data) {
@@ -177,34 +179,25 @@ export default {
             self.msgClass = "alert alert-danger";
             console.log(self.messages);
           }
-        })
+      })
         .catch(function (error) {
           console.log(error);
-        });
-
-      if (self.car.id != "") {
-        fetch("/api/uploads/?filename=" + self.car.photo)
-          .then((response) => response.json())
-          .then((data) => {
-            if ("path" in data) {
-              console.log(data.path);
-              self.photo_url = data.path;
-            }
-          });
-      }
+      });
+      
     },
     getCsrfToken() {
       let self = this;
 
       fetch("/api/csrf-token")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          self.csrf_token = data.csrf_token;
-        });
-    },
-  },
+      .then((response) => response.json())
+      .then((data) => {
+        //console.log(data);
+        self.csrf_token = data.csrf_token;
+      });
+    }
+  } 
 };
+
 </script>
 
 <style scoped>

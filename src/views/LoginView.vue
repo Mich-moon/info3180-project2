@@ -54,12 +54,12 @@
                 let loginForm = document.getElementById('loginForm');
                 let form_data = new FormData(loginForm);
                 //console.log(form_data);
-                let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
+                //let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
                 //console.log(form_data_json);
 
                 fetch("/api/auth/login", {
                     method: 'POST',
-                    body: form_data_json,
+                    body: form_data,
                     headers: {
                     'X-CSRFToken': self.csrf_token
                     }

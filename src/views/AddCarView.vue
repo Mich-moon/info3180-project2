@@ -3,7 +3,7 @@
     <div class="form-head">
       <h1>Add New Car</h1>
     </div>
-    <form @submit.prevent="add_car" id="carForm" class="component mb-5">
+    <form @submit.prevent="add_car" enctype="multipart/form-data" id="carForm" class="component mb-5">
       <div id="messages" :class="msgClass" :v-if="msgClass">
         <ul class="msg__list">
           <li
@@ -43,7 +43,7 @@
         </div>
         <div class="form-control">
           <label class="" for="cartype">Car Type</label>
-          <select name="cartype" id="cartype" required>
+          <select name="car_type" id="car_type" required>
             <option value="suv">SUV</option>
             <option value="pickup truck">Pickup Truck</option>
             <option value="convertible">Convertible</option>
@@ -78,7 +78,7 @@
       </div>
       <div class="form-control">
         <label class="" for="photo">Upload Photo</label>
-        <input type="file" name="photo" id="photo" />
+        <input type="file" name="photo" id="photo" required/>
       </div>
       <div class="form-control">
         <button class="btn btn-success mb-2">Save</button>
@@ -140,16 +140,13 @@ export default {
       let carForm = document.getElementById("carForm");
       let form_data = new FormData(carForm);
       //console.log(document.getElementById('photo').files[0].name);
-      form_data.set("photo", document.getElementById("photo").files[0].name);
-
-      let form_data_json = JSON.stringify(
-        Object.fromEntries(form_data.entries())
-      );
+      //form_data.set("photo", document.getElementById("photo").files[0].name);
+      let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
       console.log(form_data_json);
 
       fetch("/api/cars", {
         method: "POST",
-        body: form_data_json,
+        body: form_data,
         headers: {
           Authorization: "Bearer " + localStorage.getItem("token"),
           "X-CSRFToken": self.csrf_token,
@@ -166,7 +163,7 @@ export default {
             self.messages = data.error;
             self.msgClass = "alert alert-danger";
             console.log(self.messages);
-          } else {
+          } else if ("car" in data) {
             self.messages = ["Car Added Successfully"];
             self.msgClass = "alert alert-success";
             console.log(self.messages);
@@ -174,6 +171,8 @@ export default {
           }
         })
         .catch(function (error) {
+          self.messages = ["Oops. Something went wrong"];
+          self.msgClass = "alert alert-danger";
           console.log(error);
         });
     },
@@ -183,7 +182,7 @@ export default {
       fetch("/api/csrf-token")
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
+          //console.log(data);
           self.csrf_token = data.csrf_token;
         });
     },

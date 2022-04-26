@@ -4,7 +4,7 @@
     <div class="form-head">
       <h1>Register New User</h1>
     </div>
-    <form @submit.prevent="register" id="registerForm" class="component mb-5 ">
+    <form @submit.prevent="register" enctype="multipart/form-data" id="registerForm" class="component mb-5 ">
 
         <div id="messages" :class="msgClass" :v-if="msgClass">
             <ul class="msg__list">
@@ -78,30 +78,29 @@
                 let registerForm = document.getElementById('registerForm');
                 let form_data = new FormData(registerForm);
                 //console.log(document.getElementById('photo').files[0].name);
-                form_data.set('photo', document.getElementById('photo').files[0].name);
-
-                let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
-                console.log(form_data_json);
+                //form_data.set('photo', document.getElementById('photo').files[0]);
+                //let form_data_json = JSON.stringify( Object.fromEntries(form_data.entries()) );
+                //console.log(form_data);
 
                 fetch("/api/register", {
                     method: 'POST',
-                    body: form_data_json,
+                    body: form_data,
                     headers: {
                     'X-CSRFToken': self.csrf_token
                     }
                 })
                 .then(function (response) {
-                    console.log(response);
+                    //console.log(response);
                     return response.json();
                 })
                 .then(function (data) {
                     console.log(data);
 
-                    if ("errors" in data){
+                    if ("errors" in data) {
                         self.messages = data.errors;
                         self.msgClass = "alert alert-danger";
                         console.log(self.messages);
-                    } else {
+                    } else if ("user" in data) {
                         self.messages = ["Registration Successful"];
                         self.msgClass = "alert alert-success";               
                         console.log(self.messages);

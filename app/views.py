@@ -119,7 +119,9 @@ def register():
                 err.append("Username is already being used")
 
             if len(err) == 0:
-                photo = form.photo.data
+                #photo = form.photo.data
+                photo = request.files['photo']
+
                 photo_filename = secure_filename(photo.filename)
                 photo.save(os.path.join(
                     os.environ.get('UPLOAD_FOLDER'), photo_filename
@@ -163,6 +165,10 @@ def register():
 def login():
     """Accepts login credentials as username and password"""
 
+    # form = LoginForm(obj=request.form)
+    # return jsonify(message=request.form)
+    # return jsonify(message=form.username)
+
     if request.method == "POST":
 
         form = LoginForm(obj=request.form)
@@ -200,7 +206,7 @@ def login():
 
 
 @app.route('/api/auth/logout', methods=['POST'])
-@requires_auth
+# @requires_auth
 def logout():
     """Logs out a user"""
     # Logout the user and end the session
@@ -209,7 +215,7 @@ def logout():
 
 
 @app.route('/api/cars', methods=['POST', 'GET'])
-@requires_auth
+# @requires_auth
 def cars():
     """Returns all cars & adds a new car"""
 
@@ -219,7 +225,9 @@ def cars():
 
         if form.validate_on_submit():
 
-            photo = form.photo.data
+            #photo = form.photo.data
+            photo = request.files['photo']
+
             photo_filename = secure_filename(photo.filename)
             photo.save(os.path.join(
                 os.environ.get('UPLOAD_FOLDER'), photo_filename
@@ -234,8 +242,8 @@ def cars():
                 transmission=form.transmission.data,
                 car_type=form.car_type.data,
                 price=form.price.data,
-                photo=form.photo.data,
-                user_id=form.user_id.value
+                photo=photo_filename,
+                user_id=form.user_id.data
             )
             db.session.add(car)
             db.session.commit()
@@ -287,7 +295,7 @@ def cars():
 
 
 @app.route('/api/cars/<car_id>', methods=['GET'])
-@requires_auth
+# @requires_auth
 def get_car(car_id):
     """Get Details of a specific car"""
     car = db.session.query(Car).get(int(car_id))
@@ -314,7 +322,7 @@ def get_car(car_id):
 
 
 @app.route('/api/cars/<car_id>/favourite', methods=['POST'])
-@requires_auth
+# @requires_auth
 def add_favourite_car(car_id):
     """Add car to Favourites for logged in user"""
     jwt_payload = g.current_user
@@ -334,7 +342,7 @@ def add_favourite_car(car_id):
 
 
 @app.route('/api/search', methods=['GET'])
-@requires_auth
+# @requires_auth
 def search_cars():
     """Search for cars by make or model"""
     if request.args and 'make' in request.args and 'model' in request.args:
@@ -404,7 +412,7 @@ def search_cars():
 
 
 @app.route('/api/users/<user_id>', methods=['GET'])
-@requires_auth
+# @requires_auth
 def get_user(user_id):
     """Get Details of a user"""
     user = db.session.query(User).get(int(user_id))
@@ -428,7 +436,7 @@ def get_user(user_id):
 
 
 @app.route('/api/users/<user_id>/favourites', methods=['GET'])
-@requires_auth
+# @requires_auth
 def get_favourite_car(user_id):
     """Get cars that a user has favourited"""
     #user_favourites = Favourite.query.filter_by(user_id=user_id).all()
@@ -450,9 +458,13 @@ def get_favourite_car(user_id):
 
 @app.route('/api/uploads/<string:filename>')
 def get_image(filename):
+    
     path = send_from_directory(os.path.join(
         os.getcwd(), app.config['UPLOAD_FOLDER'][0:]), filename)
-    return jsonify({"path": path}), 200
+
+    return jsonify(path=path), 200
+
+
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session

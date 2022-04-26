@@ -2,7 +2,7 @@
     <div class="container-fluid d-flex flex-column">
         <div class="row px-0 component mb-5 px-2">
             <div class="col-4 mx-0 p-2">
-                <img class="card-img-top rounded-circle" :src="photo_url" />
+                <img class="card-img-top rounded-circle" :src="user.photo" />
             </div>
             <div class="col-8 mx-0 p-2">
                 <div>
@@ -82,8 +82,7 @@
 
                 fetch("/api/users/" + self.id, {
                     headers: {
-                        Authorization: "Bearer " + localStorage.getItem("token"),
-                        'X-CSRFToken': self.csrf_token
+                        Authorization: "Bearer " + localStorage.getItem("token")
                     },
                 })
                 .then(function (response) {
@@ -108,17 +107,7 @@
                     }
                 });
 
-                if (self.user.id != "") {
-                    fetch("/api/uploads/?filename=" + self.user.photo)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        if ("path" in data) {
-                            console.log(data.path);
-                            self.photo_url = data.path;
-                        } 
-                    })
-                }
-
+                this.getPhotoUrl(self.user.photo);
             },
             getFavourites(){
                 let self = this;
@@ -159,7 +148,7 @@
                 fetch("/api/csrf-token")
                 .then((response) => response.json())
                 .then((data) => {
-                console.log(data);
+                //console.log(data);
                 self.csrf_token = data.csrf_token;
                 })
             },

@@ -3,7 +3,7 @@
         <div class="card shadow-sm">
             <img
             class="card-img-top"
-            src="{{ photo_url }}"
+            :src="photo"
             />
 
             <div class="card-body">
@@ -25,39 +25,14 @@
 <script>
 	export default {
 		props: ['id', 'photo', 'year', 'make', 'model', 'price'],
-		data() {
-			return {
-                photo_url: ''
-			};
-		},
-        created() {
-          this.getPhoto();
-        },
         methods: {
             more() {
                 let self = this;
                 // redirect to car view page
-                self.$router.push({ path: '/cars/' + self.id});
-            },
-            getPhoto() {
-                let self = this;
-
-                fetch('/uploads/?filename=' + self.photo, {
-                    headers: {
-                        "Authorization" : "Bearer " + localStorage.getItem("token")
-                    }
-                })
-                .then(function (response) {
-                    return response.json();
-                })
-                .then(function (data) {
-                    console.log(data);
-                    self.photo_url = data;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+                self.$router.push({ name: 'car', params: { car_id: self.id } });
+                //self.$router.push({ path: '/cars/' + self.id});
             }
+
         }
 	}
 </script>
