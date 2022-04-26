@@ -325,7 +325,8 @@ def get_car(car_id):
 # @requires_auth
 def add_favourite_car(car_id):
     """Add car to Favourites for logged in user"""
-    user_id = g.current_user['sub']
+    #user_id = g.current_user['sub']
+    user_id = current_user.id
 
     fave = Favourite(
         car_id=int(car_id),
@@ -476,7 +477,7 @@ def get_user(user_id):
 
 
 @app.route('/api/users/<user_id>/favourites', methods=['GET'])
-@requires_auth
+# @requires_auth
 def get_favourite_car(user_id):
     """Get cars that a user has favourited"""
     #user_favourites = Favourite.query.filter_by(user_id=user_id).all()
