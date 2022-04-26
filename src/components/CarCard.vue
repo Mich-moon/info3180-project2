@@ -3,7 +3,7 @@
         <div class="card shadow-sm">
             <img
             class="card-img-top"
-            :src="photo"
+            :src="'/uploads/' + photo"
             />
 
             <div class="card-body">

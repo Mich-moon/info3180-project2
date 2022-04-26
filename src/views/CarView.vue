@@ -10,7 +10,7 @@
 
     <div class="row px-0 component mb-5 px-2">
       <div class="col-5 mx-0 p-2">
-        <img class="card-img-top" :src="car.photo" />
+        <img class="card-img-top" :src="'/uploads/' + car.photo" />
       </div>
       <div class="col-7 mx-0 p-2">
         <div>
@@ -239,5 +239,9 @@ button {
   color: white;
   font-size: small;
   padding: 0em 1em 0em 1em;
+}
+#messages {
+    width: 65%;
+    margin: 10px auto;
 }
 </style>

@@ -325,15 +325,22 @@ def get_car(car_id):
 # @requires_auth
 def add_favourite_car(car_id):
     """Add car to Favourites for logged in user"""
-    jwt_payload = g.current_user
-    jwt_user_id = jwt_payload['sub']
+    user_id = g.current_user['sub']
 
     fave = Favourite(
         car_id=int(car_id),
-        user_id=jwt_user_id
+        user_id=user_id
     )
     db.session.add(fave)
     db.session.commit()
+
+    new_id = fave.id
+    fav = db.session.query(Favourite).get(new_id)
+
+    fav_json = {
+        'car_id': fav.car_id,
+        'user_id': fav.user_id
+    }
 
     return jsonify(
         message="Car Successfully Favourited",
@@ -341,74 +348,107 @@ def add_favourite_car(car_id):
     ), 201
 
 
-@app.route('/api/search', methods=['GET'])
+@app.route('/api/search/', methods=['GET'])
 # @requires_auth
 def search_cars():
     """Search for cars by make or model"""
     if request.args and 'make' in request.args and 'model' in request.args:
         make = request.args['make']
         model = request.args['model']
-        cars = db.session.query(Car).filter_by(
+        results = db.session.query(Car).filter_by(
             make=make,
             model=model
         ).all()
-        return jsonify(cars=cars.to_dict()), 200
+
+        if results is not None:
+
+            cars = [{
+                "id": c.id,
+                "description": c.description,
+                "make": c.make,
+                "model": c.model,
+                "colour": c.colour,
+                "year": c.year,
+                "transmission": c.transmission,
+                "car_type": c.car_type,
+                "price": c.price,
+                "photo": c.photo,
+                "user_id": c.user_id
+            } for c in results]
+
+            return jsonify(cars=cars), 200
+
+        return jsonify(message="No cars found"), 400
 
     elif request.args and 'make' in request.args:
         make = request.args['make']
         results = db.session.query(Car).filter_by(make=make).all()
-        cars = [{
-            "id": c.id,
-            "description": c.description,
-            "make": c.make,
-            "model": c.model,
-            "colour": c.colour,
-            "year": c.year,
-            "transmission": c.transmission,
-            "car_type": c.car_type,
-            "price": c.price,
-            "photo": c.photo,
-            "user_id": c.user_id
-        } for c in results]
 
-        return jsonify(cars=cars), 200
+        if results is not None:
+
+            cars = [{
+                "id": c.id,
+                "description": c.description,
+                "make": c.make,
+                "model": c.model,
+                "colour": c.colour,
+                "year": c.year,
+                "transmission": c.transmission,
+                "car_type": c.car_type,
+                "price": c.price,
+                "photo": c.photo,
+                "user_id": c.user_id
+            } for c in results]
+
+            return jsonify(cars=cars), 200
+
+        return jsonify(message="No cars found"), 400
 
     elif request.args and 'model' in request.args:
         model = request.args['model']
         results = db.session.query(Car).filter_by(model=model).all()
-        cars = [{
-            "id": c.id,
-            "description": c.description,
-            "make": c.make,
-            "model": c.model,
-            "colour": c.colour,
-            "year": c.year,
-            "transmission": c.transmission,
-            "car_type": c.car_type,
-            "price": c.price,
-            "photo": c.photo,
-            "user_id": c.user_id
-        } for c in results]
 
-        return jsonify(cars=cars), 200
+        if results is not None:
+
+            cars = [{
+                "id": c.id,
+                "description": c.description,
+                "make": c.make,
+                "model": c.model,
+                "colour": c.colour,
+                "year": c.year,
+                "transmission": c.transmission,
+                "car_type": c.car_type,
+                "price": c.price,
+                "photo": c.photo,
+                "user_id": c.user_id
+            } for c in results]
+
+            return jsonify(cars=cars), 200
+
+        return jsonify(message="No cars found"), 400
 
     else:
         results = db.session.query(Car).all()
-        cars = [{
-            "id": c.id,
-            "description": c.description,
-            "make": c.make,
-            "model": c.model,
-            "colour": c.colour,
-            "year": c.year,
-            "transmission": c.transmission,
-            "car_type": c.car_type,
-            "price": c.price,
-            "photo": c.photo,
-            "user_id": c.user_id
-        } for c in results]
+        if results is not None:
 
-        return jsonify(cars=cars), 200
+            cars = [{
+                "id": c.id,
+                "description": c.description,
+                "make": c.make,
+                "model": c.model,
+                "colour": c.colour,
+                "year": c.year,
+                "transmission": c.transmission,
+                "car_type": c.car_type,
+                "price": c.price,
+                "photo": c.photo,
+                "user_id": c.user_id
+            } for c in results]
+
+            return jsonify(cars=cars), 200
+
+        return jsonify(message="No cars found"), 400
 
 
 @app.route('/api/users/<user_id>', methods=['GET'])
@@ -436,7 +476,7 @@ def get_user(user_id):
 
 
 @app.route('/api/users/<user_id>/favourites', methods=['GET'])
-# @requires_auth
+@requires_auth
 def get_favourite_car(user_id):
     """Get cars that a user has favourited"""
     #user_favourites = Favourite.query.filter_by(user_id=user_id).all()
@@ -454,16 +494,6 @@ def get_favourite_car(user_id):
         return jsonify(favourites=favs), 200
 
     return jsonify(message="Item not found"), 404
-
-
-@app.route('/api/uploads/<string:filename>')
-def get_image(filename):
-    
-    path = send_from_directory(os.path.join(
-        os.getcwd(), app.config['UPLOAD_FOLDER'][0:]), filename)
-
-    return jsonify(path=path), 200
-
 
 
 # user_loader callback. This callback is used to reload the user object from

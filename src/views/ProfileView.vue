@@ -2,7 +2,7 @@
     <div class="container-fluid d-flex flex-column">
         <div class="row px-0 component mb-5 px-2">
             <div class="col-4 mx-0 p-2">
-                <img class="card-img-top rounded-circle" :src="user.photo" />
+                <img class="card-img-top rounded-circle" :src="'/uploads/' + user.photo" />
             </div>
             <div class="col-8 mx-0 p-2">
                 <div>
@@ -107,7 +107,6 @@
                     }
                 });
 
-                this.getPhotoUrl(self.user.photo);
             },
             getFavourites(){
                 let self = this;

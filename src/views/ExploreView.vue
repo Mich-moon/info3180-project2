@@ -98,9 +98,6 @@
                             self.results = cars;
                         }
                         
-                        //self.results = JSON.stringify(data.cars);
-                        //self.results = JSON.parse(data.cars).slice(0,2);
-                        //self.results = JSON.parse(data.cars);
                         console.log(self.results);
 
                     } else if ("message" in data) {
@@ -128,7 +125,7 @@
                 console.log(model);
 
                 if (make == '' && model == '') {
-                  self.search_path = "/api/search";
+                  self.search_path = "/api/search/";
 
                 } else if (make.length == 0) {
                   self.search_path = "/api/search/?model=" +  model;
@@ -147,20 +144,26 @@
                     }
                 })
                 .then(function (response) {
-                    console.log(response);
+                    //console.log(response);
                     return response.json();
                 })
                 .then(function (data) {
                     if ("cars" in data) {
-                        elf.messages = [data.cars.length + "cars found"];
+                        let cars = data.cars;
+
+                        self.messages = [cars.length + " cars found"];
                         self.msgClass = "alert alert-success";
                         
-                        console.log(data);
-                        self.results = JSON.parse(data.cars);
-                    } 
+                        self.results = cars;
+
+                    } else if ("message" in data) {
+                        self.messages = [data.message];
+                        self.msgClass = "alert alert-danger";
+                    }
                 })
                 .catch(function (error) {
-                    self.results = [error];
+                    self.messages = ["Oops. Something went wrong"];
+                    self.msgClass = "alert alert-danger";
                     console.log(error);
                 });
 
@@ -210,5 +213,9 @@ hr {
 }
 .carcard {
     width: 100%;
+}
+#messages {
+    width: 65%;
+    margin: 10px auto;
 }
 </style>
