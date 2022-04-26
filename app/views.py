@@ -81,7 +81,7 @@ def get_csrf():
 
 @app.route('/')
 def index():
-    return return jsonify(message="message")
+    return jsonify(message="message")
 
 
 def username_exists(user_name):
