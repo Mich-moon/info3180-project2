@@ -1,4 +1,4 @@
-# info3180-project2
+# United Auto Sales
 
 United Auto Sales Web Application. This is a fictional Auto Sales site
 that will allow users to add cars that they want to sell, search for
@@ -42,3 +42,7 @@ $ source venv/bin/activate (or .\venv\Scripts\activate on Windows)
 $ pip install -r requirements.txt
 $ python run.py
 ```
+  
+## Online demo
+  
+[see here](https://fast-depths-52043.herokuapp.com/)
