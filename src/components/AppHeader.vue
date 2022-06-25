@@ -70,11 +70,6 @@ import { RouterLink } from "vue-router";
       console.log(this.logged_in);
 
     },
-    computed: {
-      check() {
-        return this.logged_in;
-      }
-    },
     methods: {
       isLoggedIn() {
         let self = this;
