@@ -66,9 +66,13 @@ import { RouterLink } from "vue-router";
       }
     },
     created() {
-      this.isLoggedIn();
+      //this.isLoggedIn();
       console.log(this.logged_in);
 
+    },
+    computed: {
+      this.isLoggedIn();
+      console.log(this.logged_in);
     },
     methods: {
       isLoggedIn() {
