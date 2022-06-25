@@ -66,18 +66,19 @@ import { RouterLink } from "vue-router";
       }
     },
     created() {
-      //this.isLoggedIn();
+      this.isLoggedIn();
       console.log(this.logged_in);
 
     },
     computed: {
-      this.isLoggedIn();
-      console.log(this.logged_in);
+      check() {
+        return this.logged_in;
+      }
     },
     methods: {
       isLoggedIn() {
         let self = this;
-
+        
         if (localStorage.getItem("token")) {
 
           self.logged_in = true;

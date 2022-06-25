@@ -6,7 +6,7 @@ import AppFooter from "@/components/AppFooter.vue";
 </script>
 
 <template>
-  <AppHeader />
+  <AppHeader :key="$route.fullPath"/>
 
   <main>
     <RouterView />
