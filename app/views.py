@@ -497,6 +497,10 @@ def get_favourite_car(user_id):
     return jsonify(message="Item not found"), 404
 
 
+@app.route('/uploads/<string:filename>')
+def get_image(filename):
+    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'][0:]), filename)
+
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 
