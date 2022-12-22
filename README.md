@@ -45,4 +45,8 @@ $ python run.py
   
 ## Online demo
   
-[see here](https://fast-depths-52043.herokuapp.com/)
+This app has been deployed [here](https://fast-depths-52043.herokuapp.com/)
+
+Login details  
+username: randomuser  
+password: password123  
