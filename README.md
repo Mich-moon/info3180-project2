@@ -43,10 +43,10 @@ $ pip install -r requirements.txt
 $ python run.py
 ```
   
-## Online demo
+~~## Online demo~~
   
-This app has been deployed [here](https://fast-depths-52043.herokuapp.com/)
+~~This app has been deployed [here](https://fast-depths-52043.herokuapp.com/)~~
 
-Login details  
-username: randomuser  
-password: password123  
+~~Login details~~  
+~~username: randomuser~~  
+~~password: password123~~  
